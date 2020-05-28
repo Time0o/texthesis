@@ -21,30 +21,34 @@ define run_bibtex
 	@rm $(OUT_DIR)/bibliography.bib
 endef
 
-all: report_full
+define add_target
+$(1)_noref: $(PDF_DIR)/$(1).pdf
 
-report_noref: $(PDF_DIR)/report.pdf
+$(1)_full: $(PDF_DIR)/$(1).pdf $(OUT_DIR)/$(1).bbl
+	@echo "correcting $(1) references..."
+	$$(call run_pdflatex,$(1))
+	$$(call run_pdflatex,$(1))
 
-report_bib: report_noref $(OUT_DIR)/report.bbl
+$(PDF_DIR)/$(1).pdf: $(TEX_DIR)/$(1).tex
+	@echo "building $(1)..."
+	$$(call run_pdflatex,$(1))
 
-report_full: report_bib
-	@echo "correcting report references..."
-	$(call run_pdflatex,report)
-	$(call run_pdflatex,report)
+$(OUT_DIR)/$(1).bbl: $(BIB_DIR)/bibliography.bib
+	@echo "building $(1) bibliography..."
+	$$(call run_bibtex,$(1))
+endef
 
-$(PDF_DIR)/report.pdf: $(TEX_DIR)/report.tex
-	@echo "building report..."
-	$(call run_pdflatex,report)
+all: report_full presentation_full
 
-$(OUT_DIR)/report.bbl: $(BIB_DIR)/bibliography.bib
-	@echo "building report bibliography..."
-	$(call run_bibtex,report)
+$(eval $(call add_target,report))
+$(eval $(call add_target,presentation))
 
 .PHONY: init clean
 
 init:
 	@mkdir -p $(TEX_DIR) $(BIB_DIR)
 	@cp $(TEMPLATE_DIR)/report.tex $(TEX_DIR)
+	@cp $(TEMPLATE_DIR)/presentation.tex $(TEX_DIR)
 	@cp $(TEMPLATE_DIR)/bibliography.bib $(BIB_DIR)
 
 clean:
