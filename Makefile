@@ -2,6 +2,7 @@ TEX_DIR:=../tex
 BIB_DIR:=../bib
 OUT_DIR:=out
 PDF_DIR:=pdf
+TEMPLATE_DIR:=templates
 
 define run_pdflatex
 	@2>&1 pdflatex -shell-escape \
@@ -39,7 +40,12 @@ $(OUT_DIR)/report.bbl: $(BIB_DIR)/bibliography.bib
 	@echo "building report bibliography..."
 	$(call run_bibtex,report)
 
-.PHONY: clean
+.PHONY: init clean
+
+init:
+	@mkdir -p $(TEX_DIR) $(BIB_DIR)
+	@cp $(TEMPLATE_DIR)/report.tex $(TEX_DIR)
+	@cp $(TEMPLATE_DIR)/bibliography.bib $(BIB_DIR)
 
 clean:
 	rm -rf $(OUT_DIR)/* $(OUT_DIR)/$(TEX_DIR) $(PDF_DIR)/*
