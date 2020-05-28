@@ -38,7 +38,8 @@ $(OUT_DIR)/$(1).bbl: $(BIB_DIR)/bibliography.bib
 	$$(call run_bibtex,$(1))
 endef
 
-all: report_full presentation_full
+report: report_full
+presentation: presentation_full
 
 $(eval $(call add_target,report))
 $(eval $(call add_target,presentation))
